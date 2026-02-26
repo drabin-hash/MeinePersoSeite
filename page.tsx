@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useEffect, useRef, useState } from "react";
 import { 
   Github, 
@@ -19,6 +20,62 @@ import {
   FolderOpen  // ← Dieser Import hat gefehlt!
 } from "lucide-react";
 
+function CursorTrail() {
+  const dotsRef = useRef<HTMLDivElement[]>([]);
+
+  useEffect(() => {
+    const dotCount = 50;
+    const dots = dotsRef.current;
+    let mouseX = 0, mouseY = 0;
+    const positions = Array.from({ length: dotCount }, () => ({ x: 0, y: 0 }));
+
+    const onMouseMove = (e: MouseEvent) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    };
+
+    let raf = 0;
+    const animate = () => {
+      positions[0].x += (mouseX - positions[0].x) * 0.15;
+      positions[0].y += (mouseY - positions[0].y) * 0.15;
+
+      for (let i = 1; i < dotCount; i++) {
+        positions[i].x += (positions[i - 1].x - positions[i].x) * 0.15;
+        positions[i].y += (positions[i - 1].y - positions[i].y) * 0.15;
+      }
+
+      dots.forEach((dot, i) => {
+        if (!dot) return;
+        const scale = 1 - i / dotCount;
+        dot.style.transform = `translate(${positions[i].x - 6}px, ${positions[i].y - 6}px) scale(${scale})`;
+        dot.style.opacity = String(scale);
+      });
+
+      raf = requestAnimationFrame(animate);
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    raf = requestAnimationFrame(animate);
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  return (
+    <>
+      {Array.from({ length: 12 }).map((_, i) => (
+        <div
+          key={i}
+          ref={(el) => { if (el) dotsRef.current[i] = el; }}
+          className="fixed left-0 top-0 w-2 h-2 rounded-full bg-green-400 pointer-events-none z-[9999]"
+        />
+      ))}
+    </>
+  );
+}
+
+
 export default function HomePage() {
   const [scrolled, setScrolled] = useState(false);
   const [typedText, setTypedText] = useState("");
@@ -33,6 +90,7 @@ export default function HomePage() {
     "karikaturist",
     "geschichtenerzähler"
   ];
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -89,6 +147,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-black text-[#00cc00] font-mono relative overflow-x-hidden">
       {/* Scanline Effect - subtiler */}
+      <CursorTrail />
       <div className="fixed inset-0 pointer-events-none z-50 opacity-3">
         <div className="absolute inset-0 bg-[linear-gradient(0deg,transparent_50%,rgba(0,204,0,0.03)_50%)] bg-[length:100%_4px]"></div>
       </div>
