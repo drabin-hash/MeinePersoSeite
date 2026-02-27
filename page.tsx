@@ -75,7 +75,6 @@ function CursorTrail() {
   );
 }
 
-
 export default function HomePage() {
   const [scrolled, setScrolled] = useState(false);
   const [typedText, setTypedText] = useState("");
@@ -83,6 +82,7 @@ export default function HomePage() {
   const [loopNum, setLoopNum] = useState(0);
   const [typingSpeed, setTypingSpeed] = useState(150);
   const [cursorVisible, setCursorVisible] = useState(true);
+  const [showGhostImage, setShowGhostImage] = useState(false);
 
   const professions = [
     "in weiterbildung zum fachinformatiker",
@@ -146,6 +146,27 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-black text-[#00cc00] font-mono relative overflow-x-hidden">
+      <button
+        type="button"
+        className="pixel-ghost"
+        aria-label="Open ghost image"
+        title="Open ghost image"
+        onClick={() => setShowGhostImage(true)}
+      />
+
+      {showGhostImage && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 p-4"
+          onClick={() => setShowGhostImage(false)}
+        >
+          <img
+            src="/The_Ghost_of_Luciano_Pavarotti.jpeg"
+            alt="bu bu bu"
+            className="max-h-[85vh] max-w-[90vw] border border-[#00cc00] object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
       {/* Scanline Effect - subtiler */}
       <CursorTrail />
       <div className="fixed inset-0 pointer-events-none z-50 opacity-3">
